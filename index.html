@@ -9,96 +9,86 @@
     body{background:#000;font-family:Consolas,monospace;color:#fff;
       display:flex;flex-direction:column;align-items:center;
       min-height:100dvh;touch-action:none;}
-
-    /* Lobby */
     #lobby{display:flex;flex-direction:column;align-items:center;
       justify-content:center;gap:14px;min-height:100dvh;padding:30px 20px;}
-    #lobby h1{font-size:clamp(2rem,10vw,3.5rem);color:#32c832;letter-spacing:8px;margin-bottom:4px;}
-    #lobby p{color:#555;font-size:.85rem;text-align:center;}
+    #lobby h1{font-size:clamp(2rem,10vw,3.5rem);color:#32c832;letter-spacing:8px;}
+    #lobby p{color:#444;font-size:.85rem;text-align:center;}
     input{background:#111;border:2px solid #333;border-radius:8px;color:#fff;
-      font-family:inherit;font-size:1rem;padding:10px 16px;
+      font-family:inherit;font-size:1rem;padding:11px 16px;
       width:min(300px,90vw);text-align:center;outline:none;}
     input:focus{border-color:#32c832;}
     .btn{background:#32c832;color:#000;border:none;border-radius:8px;
       font-family:inherit;font-weight:bold;font-size:1rem;
-      padding:14px 0;cursor:pointer;letter-spacing:1px;width:min(300px,90vw);display:block;}
+      padding:14px 0;cursor:pointer;width:min(300px,90vw);display:block;}
     .btn:active{background:#28a828;}
-    .btn.outline{background:transparent;color:#32c832;border:2px solid #32c832;}
-    .btn.outline:active{background:#0a1a0a;}
-    .divider{color:#333;font-size:.85rem;}
+    .btn.out{background:transparent;color:#32c832;border:2px solid #333;}
+    .btn.out:active{background:#0a140a;}
+    .sep{color:#222;font-size:.8rem;}
 
-    /* Game */
-    #game{display:none;flex-direction:column;align-items:center;
-      width:100%;height:100dvh;overflow:hidden;}
-    #topbar{display:flex;align-items:center;justify-content:center;
-      width:100%;padding:4px 8px;gap:6px;flex-wrap:wrap;min-height:32px;}
-    .chip{display:flex;align-items:center;gap:4px;background:#111;
-      border-radius:20px;padding:2px 8px;font-size:.75rem;}
+    #game{display:none;flex-direction:column;align-items:center;width:100%;height:100dvh;overflow:hidden;}
+    #bar{display:flex;align-items:center;justify-content:center;
+      width:100%;padding:4px 8px;gap:6px;flex-wrap:wrap;min-height:30px;}
+    .chip{display:flex;align-items:center;gap:4px;background:#0d0d0d;
+      border-radius:20px;padding:2px 8px;font-size:.73rem;}
     .chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-    .chip.dead{opacity:.3;text-decoration:line-through;}
-    #room-label{font-size:.7rem;color:#333;margin-left:4px;}
+    .chip.dead{opacity:.28;text-decoration:line-through;}
+    #rlabel{font-size:.65rem;color:#2a2a2a;margin-left:2px;}
 
-    #canvas-wrap{position:relative;width:min(100vw, calc(100dvh - 170px) * 1.25);}
-    canvas{border:2px solid #1a1a1a;background:#050505;display:block;
-      width:100%;height:auto;touch-action:none;}
+    #cw{position:relative;width:min(100vw, calc(100dvh - 168px) * 1.25);}
+    canvas{border:2px solid #111;background:#050505;display:block;width:100%;height:auto;touch-action:none;}
 
-    /* Overlay (covers canvas) */
-    #overlay{position:absolute;inset:0;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;gap:12px;
-      background:rgba(0,0,0,.88);border-radius:2px;}
-    #overlay.hidden{display:none;}
-    #ov-title{font-size:clamp(1rem,5vw,1.6rem);color:#32c832;letter-spacing:2px;}
-    #ov-msg{color:#666;font-size:.85rem;text-align:center;padding:0 16px;line-height:1.6;}
-    #ov-code{font-size:clamp(1.8rem,8vw,2.8rem);color:#fff;letter-spacing:8px;
-      background:#111;padding:10px 24px;border-radius:8px;cursor:pointer;}
-    #ov-hint{font-size:.72rem;color:#444;}
-    #ov-btn{background:#32c832;color:#000;border:none;border-radius:8px;
-      font-family:inherit;font-weight:bold;font-size:1rem;padding:12px 36px;
-      cursor:pointer;margin-top:4px;}
-    #ov-btn:active{background:#28a828;}
-    #ov-btn.hidden{display:none;}
+    #ov{position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:12px;background:rgba(0,0,0,.9);}
+    #ov.hidden{display:none;}
+    #ov h2{font-size:clamp(1rem,5vw,1.6rem);color:#32c832;letter-spacing:2px;}
+    #ov p{color:#555;font-size:.83rem;text-align:center;padding:0 16px;line-height:1.6;white-space:pre-line;}
+    #ov-code{font-size:clamp(2rem,9vw,3rem);color:#fff;letter-spacing:8px;
+      background:#111;padding:10px 24px;border-radius:8px;cursor:pointer;border:2px solid #222;}
+    #ov-code:active{background:#1a1a1a;}
+    #ov-hint{font-size:.68rem;color:#333;}
+    #ov-go{background:#32c832;color:#000;border:none;border-radius:8px;
+      font-family:inherit;font-weight:bold;font-size:1rem;
+      padding:12px 36px;cursor:pointer;display:none;}
+    #ov-go:active{background:#28a828;}
 
-    /* D-pad */
     #dpad{display:grid;grid-template-areas:'. u .' 'l . r' '. d .';
       grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);
       gap:5px;margin-top:8px;flex-shrink:0;}
-    #dpad button{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;
+    #dpad button{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;
       color:#32c832;font-size:1.2rem;cursor:pointer;display:flex;
       align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;}
-    #dpad button:active{background:#1a1a1a;border-color:#32c832;}
+    #dpad button:active{background:#151515;border-color:#32c832;}
     #du{grid-area:u;}#dl{grid-area:l;}#dr{grid-area:r;}#dd{grid-area:d;}
 
-    #toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
-      background:#1a1a1a;color:#888;padding:5px 14px;border-radius:14px;
-      font-size:.75rem;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:99;}
+    #toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
+      background:#111;color:#777;padding:5px 14px;border-radius:14px;
+      font-size:.73rem;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:9;}
     #toast.show{opacity:1;}
   </style>
 </head>
 <body>
 
-<!-- LOBBY -->
 <div id="lobby">
   <h1>SNEAK</h1>
-  <p>Multiplayer snake — play with friends</p>
-  <input id="inp-name" maxlength="14" placeholder="Your name (optional)" autocomplete="off"/>
-  <button class="btn" id="btn-create">CREATE ROOM</button>
-  <span class="divider">— or —</span>
-  <input id="inp-code" maxlength="6" placeholder="Enter room code"
-    style="text-transform:uppercase;letter-spacing:4px;font-size:1.1rem;" autocomplete="off"/>
-  <button class="btn outline" id="btn-join">JOIN ROOM</button>
+  <p>Play snake with friends on the same URL</p>
+  <input id="iname" maxlength="14" placeholder="Your name (optional)" autocomplete="off"/>
+  <button class="btn" id="bcreate">CREATE ROOM</button>
+  <span class="sep">— or join existing room —</span>
+  <input id="icode" maxlength="6" placeholder="Room code"
+    style="text-transform:uppercase;letter-spacing:5px;font-size:1.2rem;" autocomplete="off"/>
+  <button class="btn out" id="bjoin">JOIN ROOM</button>
 </div>
 
-<!-- GAME -->
 <div id="game">
-  <div id="topbar"><span id="room-label"></span></div>
-  <div id="canvas-wrap">
+  <div id="bar"><span id="rlabel"></span></div>
+  <div id="cw">
     <canvas id="c"></canvas>
-    <div id="overlay">
-      <div id="ov-title">CONNECTING…</div>
-      <div id="ov-msg"></div>
-      <div id="ov-code" class="hidden"></div>
+    <div id="ov">
+      <h2 id="ov-t">CONNECTING</h2>
+      <p id="ov-p">Setting up…</p>
+      <div id="ov-code" style="display:none"></div>
       <div id="ov-hint"></div>
-      <button id="ov-btn" class="hidden">START PLAYING</button>
+      <button id="ov-go">START PLAYING ▶</button>
     </div>
   </div>
   <div id="dpad">
@@ -106,306 +96,286 @@
     <button id="dr">▶</button><button id="dd">▼</button>
   </div>
 </div>
-
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script>
-// ── Constants ──────────────────────────────────────────────
-const TILE=20,COLS=30,ROWS=24,TICK=120,FOOD=3;
-const COLORS=['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8'];
-const STARTS=[[5,5],[25,5],[5,18],[25,18],[15,5],[15,18]];
-const UP=[0,-1],DN=[0,1],LT=[-1,0],RT=[1,0];
+<script type="module">
+import { joinRoom, selfId } from 'https://esm.sh/trystero@0.20.1/nostr'
 
-// ── DOM ────────────────────────────────────────────────────
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-canvas.width=COLS*TILE; canvas.height=ROWS*TILE;
-const lobbyEl=document.getElementById('lobby');
-const gameEl=document.getElementById('game');
-const overlay=document.getElementById('overlay');
-const ovTitle=document.getElementById('ov-title');
-const ovMsg=document.getElementById('ov-msg');
-const ovCode=document.getElementById('ov-code');
-const ovHint=document.getElementById('ov-hint');
-const ovBtn=document.getElementById('ov-btn');
-const topbar=document.getElementById('topbar');
-const roomLabel=document.getElementById('room-label');
+// ── constants ──────────────────────────────────────────────
+const APP   = { appId:'sneak-v3' }
+const TILE=20,COLS=30,ROWS=24,TICK=130,FOOD=3
+const COLORS=['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8']
+const STARTS=[[5,5],[25,5],[5,18],[25,18],[15,5],[15,18]]
+const UP=[0,-1],DN=[0,1],LT=[-1,0],RT=[1,0]
 
-// ── State ──────────────────────────────────────────────────
-let peer,myName,myId,isHost=false;
-let hostConn=null,clientConns=[],connNames=new Map();
-let gameTimer=null,colorIdx=0,players={},food=[];
+// ── dom ────────────────────────────────────────────────────
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d')
+canvas.width=COLS*TILE; canvas.height=ROWS*TILE
+const lobbyEl=document.getElementById('lobby')
+const gameEl =document.getElementById('game')
+const ov     =document.getElementById('ov')
+const ovT    =document.getElementById('ov-t')
+const ovP    =document.getElementById('ov-p')
+const ovCode =document.getElementById('ov-code')
+const ovHint =document.getElementById('ov-hint')
+const ovGo   =document.getElementById('ov-go')
+const bar    =document.getElementById('bar')
+const rlabel =document.getElementById('rlabel')
 
-// ── Lobby handlers ─────────────────────────────────────────
-document.getElementById('btn-create').onclick=()=>{
-  myName=getName();
-  switchToGame();
-  tryCreateRoom();
-};
-document.getElementById('btn-join').onclick=()=>{
-  const code=document.getElementById('inp-code').value.trim().toUpperCase();
-  if(!code){alert('Please enter a room code.');return;}
-  myName=getName();
-  switchToGame();
-  tryJoinRoom(code);
-};
-document.getElementById('inp-code').addEventListener('keydown',e=>{
-  if(e.key==='Enter')document.getElementById('btn-join').click();
-});
+// ── state ──────────────────────────────────────────────────
+let myName, myCode
+let isHost=false, hostId=null, peers=new Set()
+let gt=null, ci=0, pl={}, fd=[]
+let sSt,sDr,sNm,sHost,sEnd  // senders
 
-function getName(){
-  return document.getElementById('inp-name').value.trim().slice(0,14)||'Player'+~~(Math.random()*99+1);
+// ── lobby ──────────────────────────────────────────────────
+document.getElementById('bcreate').onclick = () => {
+  myName = getName()
+  myCode = randCode()
+  go()
+  startMultiplayer()
 }
-function switchToGame(){
-  lobbyEl.style.display='none';
-  gameEl.style.display='flex';
-  setOverlay('CONNECTING…','Reaching server…');
+document.getElementById('bjoin').onclick = () => {
+  const code = document.getElementById('icode').value.trim().toUpperCase()
+  if (!code) { alert('Enter a room code first.'); return }
+  myName = getName()
+  myCode = code
+  go()
+  startMultiplayer()
+}
+document.getElementById('icode').onkeydown = e => { if(e.key==='Enter') document.getElementById('bjoin').click() }
+
+function getName() {
+  return document.getElementById('iname').value.trim().slice(0,14) || 'Player'+~~(Math.random()*99+1)
+}
+function go() {
+  lobbyEl.style.display='none'
+  gameEl.style.display='flex'
+  setOv('CONNECTING…','Joining room '+myCode+'…')
 }
 
-// ── PeerJS check ───────────────────────────────────────────
-function peerJsReady(){
-  if(typeof Peer==='undefined'){
-    setOverlay('ERROR','PeerJS failed to load. Check your internet and refresh.');
-    return false;
+// ── multiplayer setup ──────────────────────────────────────
+async function startMultiplayer() {
+  let room
+  try {
+    room = joinRoom(APP, myCode)
+  } catch(e) {
+    setOv('ERROR','Could not connect.\n'+String(e))
+    return
   }
-  return true;
+
+  ;[sSt, ] = room.makeAction('s')   // state (host→clients)
+  ;[sDr, ] = room.makeAction('d')   // direction (client→host)
+  ;[sNm, ] = room.makeAction('n')   // name exchange
+  ;[sHost,] = room.makeAction('h')  // host announcement
+  ;[sEnd, ] = room.makeAction('e')  // round end
+
+  const [,oSt  ] = room.makeAction('s')
+  const [,oDr  ] = room.makeAction('d')
+  const [,oNm  ] = room.makeAction('n')
+  const [,oHost] = room.makeAction('h')
+  const [,oEnd ] = room.makeAction('e')
+
+  room.onPeerJoin(id => {
+    peers.add(id)
+    sNm(myName, [id])               // send my name to new peer
+    if (isHost) {
+      addPl(id, '?')
+      sHost(selfId, [id])           // tell them I'm the host
+    }
+  })
+
+  room.onPeerLeave(id => {
+    peers.delete(id)
+    if (isHost) delete pl[id]
+    if (id === hostId) { hostId=null; setTimeout(elect,400) }
+    toast((pl[id]?.name||'Someone')+' left')
+  })
+
+  oNm((name, id) => {
+    toast(name+' joined!')
+    if (pl[id]) pl[id].name = name
+    else if (isHost) addPl(id, name)
+  })
+
+  oSt((s, id) => {
+    if (!isHost && id===hostId) {
+      ov.classList.add('hidden')
+      renderAll(s.p, s.f)
+    }
+  })
+
+  oDr((d, id) => {
+    if (isHost) { const p=pl[id]; if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d }
+  })
+
+  oHost((id) => {
+    hostId = id
+    if (id !== selfId) {
+      setOv('CONNECTED ✓','Game is running…')
+      setTimeout(()=>ov.classList.add('hidden'), 2000)
+    }
+  })
+
+  oEnd(() => {
+    if (!isHost) setOv('ROUND OVER','Next round in 4 seconds…')
+  })
+
+  // Wait for peer discovery, then elect if no host found
+  await delay(1200)
+  if (!hostId) elect()
 }
 
-// ── Create Room ────────────────────────────────────────────
-function tryCreateRoom(){
-  if(!peerJsReady())return;
-  isHost=true;
-  const code=randCode();
-
-  // Timeout if no connection in 10s
-  const timeout=setTimeout(()=>{
-    setOverlay('CONNECTION FAILED',
-      'Could not connect to the relay server.\nTry refreshing the page.');
-  },10000);
-
-  peer=new Peer('sneak-'+code);
-  peer.on('error',err=>{
-    clearTimeout(timeout);
-    if(err.type==='unavailable-id'){peer.destroy();tryCreateRoom();return;}
-    setOverlay('ERROR','Could not create room.\n'+String(err.type));
-  });
-  peer.on('open',()=>{
-    clearTimeout(timeout);
-    myId=peer.id;
-    roomLabel.textContent='Room: '+code;
-    colorIdx=0;players={};food=[];
-    addPlayer(myId,myName);
-    spawnFood();
-    startLoop();
-    // Show room code + START button
-    setOverlay('YOUR ROOM CODE','Share this code with friends:');
-    ovCode.textContent=code;
-    ovCode.classList.remove('hidden');
-    ovHint.textContent='Tap code to copy';
-    ovBtn.classList.remove('hidden');
-    ovBtn.textContent='START PLAYING ▶';
-  });
-  peer.on('connection',conn=>{
-    conn.on('open',()=>{
-      const n=conn.metadata?.name||'Player';
-      connNames.set(conn.peer,n);
-      clientConns.push(conn);
-      addPlayer(conn.peer,n);
-      toast(n+' joined!');
-      conn.on('data',d=>{
-        if(d.t==='dir'){const p=players[conn.peer];if(p&&p.alive&&!opp(d.d,p.dir))p.nextDir=d.d;}
-      });
-      conn.on('close',()=>{
-        const name=connNames.get(conn.peer)||'Player';
-        connNames.delete(conn.peer);
-        clientConns=clientConns.filter(c=>c.peer!==conn.peer);
-        delete players[conn.peer];
-        toast(name+' left');
-      });
-    });
-  });
+function elect() {
+  const all = [selfId, ...peers].sort()
+  if (all[0] === selfId) becomeHost()
 }
 
-// ── Join Room ──────────────────────────────────────────────
-function tryJoinRoom(code){
-  if(!peerJsReady())return;
-  isHost=false;
+function becomeHost() {
+  if (isHost) return
+  isHost=true; hostId=selfId
+  ci=0; pl={}; fd=[]
+  addPl(selfId, myName)
+  peers.forEach(id => pl[id] ? null : addPl(id,'?'))
+  spawnFd(); startLoop()
+  sHost(selfId)
+  rlabel.textContent = 'Room: '+myCode
 
-  const timeout=setTimeout(()=>{
-    setOverlay('CONNECTION FAILED','Could not reach room "'+code+'".\nMake sure the code is correct.');
-  },10000);
-
-  peer=new Peer();
-  peer.on('error',err=>{
-    clearTimeout(timeout);
-    setOverlay('ERROR','Could not connect.\n'+String(err.type));
-  });
-  peer.on('open',()=>{
-    myId=peer.id;
-    hostConn=peer.connect('sneak-'+code,{metadata:{name:myName},reliable:true});
-    setOverlay('JOINING…','Connecting to room '+code+'…');
-
-    const connTimeout=setTimeout(()=>{
-      clearTimeout(timeout);
-      setOverlay('NOT FOUND','Room "'+code+'" not found.\nCheck the code and try again.');
-    },8000);
-
-    hostConn.on('open',()=>{
-      clearTimeout(timeout);clearTimeout(connTimeout);
-      roomLabel.textContent='Room: '+code;
-      setOverlay('CONNECTED!','Game starting…');
-      setTimeout(()=>overlay.classList.add('hidden'),1500);
-    });
-    hostConn.on('data',d=>{
-      if(d.t==='state'){overlay.classList.add('hidden');renderAll(d.ps,d.fd);}
-      if(d.t==='end'){setOverlay('ROUND OVER','Next round in 4 seconds…');}
-    });
-    hostConn.on('close',()=>setOverlay('DISCONNECTED','The host left the room.'));
-    hostConn.on('error',()=>{clearTimeout(connTimeout);setOverlay('ERROR','Connection to host failed.');});
-  });
+  // Show code overlay with START button
+  ovCode.textContent = myCode
+  ovCode.style.display = 'block'
+  ovHint.textContent = 'Tap code to copy  •  Share with friends'
+  ovGo.style.display = 'block'
+  setOv('YOUR ROOM CODE','')
 }
 
-// START button dismisses overlay
-ovBtn.onclick=()=>{
-  overlay.classList.add('hidden');
-  ovCode.classList.add('hidden');
-  ovBtn.classList.add('hidden');
-};
-
-// Tap code to copy
-ovCode.onclick=()=>{
-  navigator.clipboard?.writeText(ovCode.textContent).then(()=>toast('Code copied!'));
-};
-
-// ── Game logic ─────────────────────────────────────────────
-function addPlayer(id,n){
-  if(players[id])return;
-  const i=colorIdx++;
-  players[id]={id,name:n,color:COLORS[i%COLORS.length],
-    snake:[STARTS[i%STARTS.length].slice()],dir:RT,nextDir:RT,score:0,alive:true};
+ovGo.onclick = () => { ov.classList.add('hidden') }
+ovCode.onclick = () => {
+  navigator.clipboard?.writeText(myCode).then(()=>toast('Code copied!'))
 }
-function opp(a,b){return a[0]===-b[0]&&a[1]===-b[1];}
-function randCode(){return Math.random().toString(36).slice(2,6).toUpperCase();}
+
+// ── game ───────────────────────────────────────────────────
+function addPl(id,name) {
+  if (pl[id]) return
+  const i=ci++
+  pl[id]={id,name,color:COLORS[i%COLORS.length],
+    snake:[STARTS[i%STARTS.length].slice()],dir:RT,nextDir:RT,score:0,alive:true}
+}
+function opp(a,b){return a[0]===-b[0]&&a[1]===-b[1]}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function randCode(){return Math.random().toString(36).slice(2,6).toUpperCase()}
 function randPos(ex){
-  let p;do{p=[~~(Math.random()*COLS),~~(Math.random()*ROWS)];}
-  while(ex.has(p[0]+','+p[1]));return p;
+  let p; do{p=[~~(Math.random()*COLS),~~(Math.random()*ROWS)]}
+  while(ex.has(p[0]+','+p[1])); return p
 }
 function cells(){
-  const s=new Set();
-  for(const p of Object.values(players))for(const[x,y]of p.snake)s.add(x+','+y);
-  return s;
+  const s=new Set()
+  for(const p of Object.values(pl)) for(const[x,y]of p.snake) s.add(x+','+y)
+  return s
 }
-function spawnFood(){
-  const occ=cells();food.forEach(([x,y])=>occ.add(x+','+y));
-  while(food.length<FOOD)food.push(randPos(occ));
+function spawnFd(){
+  const occ=cells(); fd.forEach(([x,y])=>occ.add(x+','+y))
+  while(fd.length<FOOD) fd.push(randPos(occ))
 }
-function startLoop(){
-  clearInterval(gameTimer);
-  gameTimer=setInterval(tick,TICK);
-}
+function startLoop(){ clearInterval(gt); gt=setInterval(tick,TICK) }
 function tick(){
-  const ps=Object.values(players);if(!ps.length)return;
-  for(const p of ps){if(!p.alive)continue;p.dir=p.nextDir;
-    p.nh=[p.snake[0][0]+p.dir[0],p.snake[0][1]+p.dir[1]];}
-  for(const p of ps){if(!p.alive)continue;
-    const[hx,hy]=p.nh;
-    if(hx<0||hx>=COLS||hy<0||hy>=ROWS){p.alive=false;continue;}
-    if(p.snake.slice(1,-1).some(([x,y])=>x===hx&&y===hy)){p.alive=false;continue;}
-    for(const o of ps){if(o.id===p.id||!o.alive)continue;
-      if(o.snake.some(([x,y])=>x===hx&&y===hy)){p.alive=false;break;}}
+  const ps=Object.values(pl); if(!ps.length)return
+  for(const p of ps){if(!p.alive)continue;p.dir=p.nextDir
+    p.nh=[p.snake[0][0]+p.dir[0],p.snake[0][1]+p.dir[1]]}
+  for(const p of ps){if(!p.alive)continue
+    const[hx,hy]=p.nh
+    if(hx<0||hx>=COLS||hy<0||hy>=ROWS){p.alive=false;continue}
+    if(p.snake.slice(1,-1).some(([x,y])=>x===hx&&y===hy)){p.alive=false;continue}
+    for(const o of ps){if(o.id===p.id||!o.alive)continue
+      if(o.snake.some(([x,y])=>x===hx&&y===hy)){p.alive=false;break}}
   }
-  for(const p of ps){if(!p.alive)continue;
-    p.snake.unshift(p.nh);
-    const fi=food.findIndex(([fx,fy])=>fx===p.nh[0]&&fy===p.nh[1]);
-    if(fi!==-1){p.score+=10;food.splice(fi,1);}else p.snake.pop();
+  for(const p of ps){if(!p.alive)continue
+    p.snake.unshift(p.nh)
+    const fi=fd.findIndex(([fx,fy])=>fx===p.nh[0]&&fy===p.nh[1])
+    if(fi!==-1){p.score+=10;fd.splice(fi,1)}else p.snake.pop()
   }
-  spawnFood();
-  const state={ps:ps.map(p=>({id:p.id,name:p.name,color:p.color,snake:p.snake,score:p.score,alive:p.alive})),fd:food};
-  renderAll(state.ps,state.fd);
-  clientConns.forEach(c=>{try{c.send({t:'state',...state});}catch(_){}});
-  const alive=ps.filter(p=>p.alive);
+  spawnFd()
+  const state={p:ps.map(p=>({id:p.id,name:p.name,color:p.color,snake:p.snake,score:p.score,alive:p.alive})),f:fd}
+  renderAll(state.p,state.f)
+  sSt(state)
+  const alive=ps.filter(p=>p.alive)
   if(ps.length>1&&alive.length<=1){
-    clearInterval(gameTimer);gameTimer=null;
+    clearInterval(gt);gt=null
     setTimeout(()=>{
-      clientConns.forEach(c=>{try{c.send({t:'end'});}catch(_){}});
-      setOverlay('ROUND OVER','Next round in 4 seconds…');
+      sEnd(1); setOv('ROUND OVER','Next round in 4 seconds…')
       setTimeout(()=>{
-        colorIdx=0;players={};food=[];
-        [...connNames.entries()].forEach(([id,n])=>addPlayer(id,n));
-        addPlayer(myId,myName);spawnFood();startLoop();
-        overlay.classList.add('hidden');
-      },4000);
-    },500);
+        ci=0;pl={};fd=[]
+        addPl(selfId,myName)
+        peers.forEach(id=>addPl(id,pl[id]?.name||'?'))
+        spawnFd();startLoop()
+        ov.classList.add('hidden')
+      },4000)
+    },600)
   }
 }
 
-// ── Render ─────────────────────────────────────────────────
-function renderAll(ps,fd){renderTopbar(ps);draw(ps,fd);}
-function renderTopbar(ps){
-  topbar.querySelectorAll('.chip').forEach(c=>c.remove());
+// ── render ─────────────────────────────────────────────────
+function renderAll(ps,f){drawBar(ps);draw(ps,f)}
+function drawBar(ps){
+  bar.querySelectorAll('.chip').forEach(c=>c.remove())
   ps.forEach(p=>{
-    const c=document.createElement('div');
-    c.className='chip'+(p.alive?'':' dead');
+    const c=document.createElement('div')
+    c.className='chip'+(p.alive?'':' dead')
     c.innerHTML=`<span class="dot" style="background:${p.color}"></span>`+
       `<span>${esc(p.name)}</span>`+
-      `<span style="color:${p.color};margin-left:3px">${p.score}</span>`;
-    topbar.appendChild(c);
-  });
-  topbar.appendChild(roomLabel);
+      `<span style="color:${p.color};margin-left:3px">${p.score}</span>`
+    bar.appendChild(c)
+  })
+  bar.appendChild(rlabel)
 }
-function draw(ps,fd){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='#111';ctx.lineWidth=.5;
-  for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,canvas.height);ctx.stroke();}
-  for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(canvas.width,y*TILE);ctx.stroke();}
-  fd.forEach(([fx,fy])=>{
-    const cx=fx*TILE+TILE/2,cy=fy*TILE+TILE/2;
-    ctx.fillStyle='#c82828';ctx.beginPath();ctx.arc(cx,cy,TILE/2-3,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(cx,cy,TILE/4,0,Math.PI*2);ctx.fill();
-  });
-  [...ps].sort((a,b)=>a.alive-b.alive).forEach(p=>{
-    ctx.globalAlpha=p.alive?1:.25;
+function draw(ps,f){
+  ctx.clearRect(0,0,canvas.width,canvas.height)
+  ctx.strokeStyle='#111';ctx.lineWidth=.5
+  for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,canvas.height);ctx.stroke()}
+  for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(canvas.width,y*TILE);ctx.stroke()}
+  f.forEach(([fx,fy])=>{
+    const cx=fx*TILE+TILE/2,cy=fy*TILE+TILE/2
+    ctx.fillStyle='#c82828';ctx.beginPath();ctx.arc(cx,cy,TILE/2-3,0,Math.PI*2);ctx.fill()
+    ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(cx,cy,TILE/4,0,Math.PI*2);ctx.fill()
+  })
+  ;[...ps].sort((a,b)=>a.alive-b.alive).forEach(p=>{
+    ctx.globalAlpha=p.alive?1:.22
     p.snake.forEach(([x,y],i)=>{
-      ctx.fillStyle=p.color;rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4);ctx.fill();
-      if(i>0){ctx.fillStyle=dk(p.color);rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2);ctx.fill();}
-    });ctx.globalAlpha=1;
-  });
+      ctx.fillStyle=p.color;rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4);ctx.fill()
+      if(i>0){ctx.fillStyle=dk(p.color);rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2);ctx.fill()}
+    });ctx.globalAlpha=1
+  })
 }
-function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-function dk(hex){const n=parseInt(hex.slice(1),16);return`rgb(${Math.max(0,((n>>16)&255)-60)},${Math.max(0,((n>>8)&255)-60)},${Math.max(0,(n&255)-60)})`;}
-function setOverlay(t,m){ovTitle.textContent=t;ovMsg.textContent=m;overlay.classList.remove('hidden');}
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
+function dk(h){const n=parseInt(h.slice(1),16);return`rgb(${Math.max(0,((n>>16)&255)-60)},${Math.max(0,((n>>8)&255)-60)},${Math.max(0,(n&255)-60)})`}
+function setOv(t,p){ovT.textContent=t;ovP.textContent=p;ov.classList.remove('hidden')}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-// ── Controls ───────────────────────────────────────────────
-function sendDir(d){
-  if(isHost){const p=players[myId];if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d;}
-  else if(hostConn?.open)hostConn.send({t:'dir',d});
+// ── controls ───────────────────────────────────────────────
+function dir(d){
+  if(isHost){const p=pl[selfId];if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d}
+  else sDr&&sDr(d)
 }
 document.addEventListener('keydown',e=>{
-  const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DN,s:DN,S:DN,ArrowLeft:LT,a:LT,A:LT,ArrowRight:RT,d:RT,D:RT};
-  if(m[e.key]){sendDir(m[e.key]);e.preventDefault();}
-});
-document.getElementById('du').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(UP);});
-document.getElementById('dd').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(DN);});
-document.getElementById('dl').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(LT);});
-document.getElementById('dr').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(RT);});
-let tx=null,ty=null;
-canvas.addEventListener('touchstart',e=>{e.preventDefault();tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:false});
+  const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DN,s:DN,S:DN,ArrowLeft:LT,a:LT,A:LT,ArrowRight:RT,d:RT,D:RT}
+  if(m[e.key]){dir(m[e.key]);e.preventDefault()}
+})
+document.getElementById('du').addEventListener('pointerdown',e=>{e.preventDefault();dir(UP)})
+document.getElementById('dd').addEventListener('pointerdown',e=>{e.preventDefault();dir(DN)})
+document.getElementById('dl').addEventListener('pointerdown',e=>{e.preventDefault();dir(LT)})
+document.getElementById('dr').addEventListener('pointerdown',e=>{e.preventDefault();dir(RT)})
+let tx=null,ty=null
+canvas.addEventListener('touchstart',e=>{e.preventDefault();tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:false})
 canvas.addEventListener('touchend',e=>{
-  e.preventDefault();if(tx===null)return;
-  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dx)<10&&Math.abs(dy)<10)return;
-  sendDir(Math.abs(dx)>Math.abs(dy)?(dx>0?RT:LT):(dy>0?DN:UP));
-  tx=ty=null;
-},{passive:false});
+  e.preventDefault();if(tx===null)return
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty
+  if(Math.abs(dx)<10&&Math.abs(dy)<10)return
+  dir(Math.abs(dx)>Math.abs(dy)?(dx>0?RT:LT):(dy>0?DN:UP))
+  tx=ty=null
+},{passive:false})
 
-// ── Toast ──────────────────────────────────────────────────
-let tt;
-function toast(m){
-  const el=document.getElementById('toast');
-  el.textContent=m;el.classList.add('show');
-  clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2500);
-}
+let tt
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2500)}
 </script>
 </body>
 </html>
