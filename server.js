@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const { Pool } = require('pg');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,13 +10,47 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- PostgreSQL ---
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+});
+
+let leaderboard = []; // in-memory cache, refreshed from DB
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS leaderboard (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(50) NOT NULL,
+      score INTEGER NOT NULL,
+      date DATE DEFAULT CURRENT_DATE
+    )
+  `);
+  await refreshLb();
+}
+
+async function refreshLb() {
+  const { rows } = await pool.query(
+    `SELECT name, score, TO_CHAR(date, 'MM/DD/YYYY') AS date
+     FROM leaderboard ORDER BY score DESC LIMIT 20`
+  );
+  leaderboard = rows;
+}
+
+async function saveScore(name, score) {
+  await pool.query(
+    `INSERT INTO leaderboard (name, score) VALUES ($1, $2)`,
+    [name, score]
+  );
+  await refreshLb();
+}
+
 // --- Game constants ---
 const COLS = 30, ROWS = 24, TICK = 120, FOOD_COUNT = 3;
 const COLORS = ['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8'];
 const STARTS = [[5,5],[25,5],[5,18],[25,18],[15,5],[15,18]];
 const UP=[0,-1], DOWN=[0,1], LEFT=[-1,0], RIGHT=[1,0];
-
-let leaderboard = []; // { name, score, date } top 20 all-time
 
 function opp(a,b){ return a[0]===-b[0] && a[1]===-b[1]; }
 
@@ -126,9 +161,7 @@ class Room {
     for (const p of ps) {
       if (!p.alive && !p.recorded) {
         p.recorded = true;
-        leaderboard.push({ name: p.name, score: p.score, date: new Date().toLocaleDateString() });
-        leaderboard.sort((a,b)=>b.score-a.score);
-        if (leaderboard.length > 20) leaderboard.length = 20;
+        if (p.score > 0) saveScore(p.name, p.score).catch(console.error);
       }
     }
 
@@ -168,7 +201,7 @@ io.on('connection', socket => {
     socket.join(room.id);
     room.addPlayer(socket.id, (name||'Player').substring(0,16));
     io.to(room.id).emit('msg', `${room.players[socket.id].name} joined`);
-    socket.emit('joined', { color: room.players[socket.id].color, lb: leaderboard.slice(0,10) });
+    socket.emit('joined', { color: room.players[socket.id].color, lb: leaderboard.slice(0, 10) });
     if (!room.started) room.start();
   });
 
@@ -189,4 +222,6 @@ io.on('connection', socket => {
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log(`Sneak server on port ${PORT}`));
+initDb()
+  .then(() => server.listen(PORT, () => console.log(`Sneak server on port ${PORT}`)))
+  .catch(err => { console.error('DB init failed:', err); process.exit(1); });
