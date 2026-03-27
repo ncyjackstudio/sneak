@@ -74,21 +74,6 @@
 </head>
 <body>
 
-<!-- SETUP (first time only) -->
-<div id="setup" class="screen">
-  <h1>SNEAK</h1>
-  <h2>ONE-TIME SETUP</h2>
-  <p>
-    1. Go to <b>console.firebase.google.com</b><br>
-    2. Create project → Build → Realtime Database<br>
-    3. Create database → Test mode → Enable<br>
-    4. Copy the URL and paste below
-  </p>
-  <input id="ifb" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off"/>
-  <div class="err" id="fb-err">Invalid URL. Must end with .firebaseio.com</div>
-  <button class="btn" id="bsave">SAVE &amp; CONTINUE</button>
-</div>
-
 <!-- LOBBY -->
 <div id="lobby" class="screen">
   <h1>SNEAK</h1>
@@ -139,43 +124,16 @@ canvas.width=COLS*TILE; canvas.height=ROWS*TILE
 let db=null, myId=null, isHost=false, myCode='', myName=''
 let gt=null, ci=0, pl={}, fd=[]
 
-const FB_KEY='sneak_fb'
+const FB_URL='https://sneak-3c9c1-default-rtdb.asia-southeast1.firebasedatabase.app'
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
 }
 
-// ── setup ──────────────────────────────────────────────────
-function initFb(url){
-  try{
-    if(firebase.apps.length) firebase.app().delete()
-    firebase.initializeApp({databaseURL:url})
-    db=firebase.database()
-    return true
-  }catch(e){return false}
-}
-
-const savedFb=localStorage.getItem(FB_KEY)
-if(savedFb && initFb(savedFb)){
-  showScreen('lobby')
-}else{
-  showScreen('setup')
-}
-
-document.getElementById('bsave').onclick=()=>{
-  const url=document.getElementById('ifb').value.trim().replace(/\/$/,'')
-  const errEl=document.getElementById('fb-err')
-  if(!url.includes('firebaseio.com')){errEl.style.display='block';return}
-  errEl.style.display='none'
-  if(initFb(url)){
-    localStorage.setItem(FB_KEY,url)
-    showScreen('lobby')
-  }else{
-    errEl.textContent='Could not connect. Check the URL.'
-    errEl.style.display='block'
-  }
-}
+firebase.initializeApp({databaseURL:FB_URL})
+db=firebase.database()
+showScreen('lobby')
 
 // ── lobby ──────────────────────────────────────────────────
 document.getElementById('bcreate').onclick=()=>{
