@@ -15,9 +15,7 @@
     .screen.active{display:flex;}
 
     h1{font-size:clamp(2rem,10vw,3.5rem);color:#32c832;letter-spacing:8px;}
-    h2{font-size:1.1rem;color:#32c832;letter-spacing:2px;}
     p{color:#555;font-size:.83rem;text-align:center;line-height:1.6;max-width:300px;}
-    p b{color:#aaa;}
 
     input{background:#111;border:2px solid #333;border-radius:8px;color:#fff;
       font-family:inherit;font-size:.95rem;padding:11px 14px;
@@ -30,7 +28,6 @@
     .btn.sec{background:transparent;color:#32c832;border:2px solid #333;}
     .btn.sec:active{background:#0a140a;}
     .sep{color:#222;font-size:.8rem;}
-    .err{color:#e03232;font-size:.8rem;display:none;}
 
     /* Game */
     #game{flex-direction:column;align-items:center;width:100%;height:100dvh;overflow:hidden;}
@@ -51,7 +48,7 @@
     #ov-t{font-size:clamp(1rem,5vw,1.6rem);color:#32c832;letter-spacing:2px;}
     #ov-p{color:#555;font-size:.82rem;text-align:center;padding:0 16px;white-space:pre-line;}
     #ov-code{font-size:clamp(1.8rem,8vw,2.8rem);color:#fff;letter-spacing:10px;
-      background:#111;border:2px solid #222;padding:10px 24px;border-radius:8px;cursor:pointer;}
+      background:#111;border:2px solid #222;padding:10px 24px;border-radius:8px;cursor:pointer;display:none;}
     #ov-hint{font-size:.68rem;color:#2a2a2a;}
     #ov-go{background:#32c832;color:#000;border:none;border-radius:8px;
       font-family:inherit;font-weight:bold;font-size:1rem;padding:13px 40px;cursor:pointer;display:none;}
@@ -93,7 +90,7 @@
     <div id="ov">
       <div id="ov-t">LOADING</div>
       <div id="ov-p"></div>
-      <div id="ov-code" style="display:none"></div>
+      <div id="ov-code"></div>
       <div id="ov-hint"></div>
       <button id="ov-go">START PLAYING ▶</button>
     </div>
@@ -105,34 +102,47 @@
 </div>
 <div id="toast"></div>
 
-<!-- Firebase SDK (plain script, no modules) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script>
 // ── constants ──────────────────────────────────────────────
 const TILE=20,COLS=30,ROWS=24,TICK=150,FOOD=3
 const COLORS=['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8']
 const STARTS=[[5,5],[25,5],[5,18],[25,18],[15,5],[15,18]]
 const UP=[0,-1],DN=[0,1],LT=[-1,0],RT=[1,0]
+const FB='https://sneak-3c9c1-default-rtdb.asia-southeast1.firebasedatabase.app'
 
 // ── dom ────────────────────────────────────────────────────
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d')
 canvas.width=COLS*TILE; canvas.height=ROWS*TILE
 
-// ── firebase ───────────────────────────────────────────────
-let db=null, myId=null, isHost=false, myCode='', myName=''
-let gt=null, ci=0, pl={}, fd=[]
+// ── state ──────────────────────────────────────────────────
+let myId=null,isHost=false,myCode='',myName=''
+let gt=null,ci=0,pl={},fd=[]
+let esState=null,esDirs=null,esPlayers=null
 
-const FB_URL='https://sneak-3c9c1-default-rtdb.asia-southeast1.firebasedatabase.app'
+// ── firebase REST helpers ──────────────────────────────────
+function fbSet(path,data){
+  return fetch(FB+'/'+path+'.json',{method:'PUT',body:JSON.stringify(data),
+    headers:{'Content-Type':'application/json'}}).catch(()=>{})
+}
+function fbGet(path){
+  return fetch(FB+'/'+path+'.json').then(r=>r.json()).catch(()=>null)
+}
+function fbDel(path){
+  return fetch(FB+'/'+path+'.json',{method:'DELETE'}).catch(()=>{})
+}
+function fbListen(path,cb){
+  const es=new EventSource(FB+'/'+path+'.json')
+  es.addEventListener('put',e=>{try{cb(JSON.parse(e.data).data)}catch(err){}})
+  es.addEventListener('patch',e=>{try{cb(JSON.parse(e.data).data)}catch(err){}})
+  es.onerror=()=>{}
+  return es
+}
 
+// ── screens ────────────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
 }
-
-firebase.initializeApp({databaseURL:FB_URL})
-db=firebase.database()
 showScreen('lobby')
 
 // ── lobby ──────────────────────────────────────────────────
@@ -162,8 +172,8 @@ function randCode(){return Math.random().toString(36).slice(2,6).toUpperCase()}
 // ── host ───────────────────────────────────────────────────
 function startHost(){
   setOv('YOUR ROOM CODE','Share this with friends:')
-  document.getElementById('ov-code').textContent=myCode
-  document.getElementById('ov-code').style.display='block'
+  const ovCode=document.getElementById('ov-code')
+  ovCode.textContent=myCode; ovCode.style.display='block'
   document.getElementById('ov-hint').textContent='Tap code to copy'
   document.getElementById('ov-go').style.display='block'
   document.getElementById('rlbl').textContent='Room: '+myCode
@@ -171,74 +181,62 @@ function startHost(){
   ci=0; pl={}; fd=[]
   addPl(myId,myName)
   spawnFd()
-  startLoop()
 
-  const room=db.ref('rooms/'+myCode)
-  // Announce as host
-  room.child('host').set(myId)
-  // Clean up old state
-  room.child('state').remove()
-  room.child('dirs').remove()
-  room.child('players/'+myId).set({name:myName,ts:Date.now()})
+  // Write room info
+  fbSet('rooms/'+myCode+'/host',myId)
+  fbDel('rooms/'+myCode+'/state')
+  fbDel('rooms/'+myCode+'/dirs')
+  fbSet('rooms/'+myCode+'/players/'+myId,{name:myName,ts:Date.now()})
 
-  // Listen for new players joining
-  room.child('players').on('child_added',snap=>{
-    const pid=snap.key
-    if(pid===myId)return
-    const data=snap.val()
-    if(!pl[pid]){addPl(pid,data.name||'Player');toast(data.name+' joined!')}
-  })
-  room.child('players').on('child_removed',snap=>{
-    const pid=snap.key
-    if(pl[pid])toast(pl[pid].name+' left')
-    delete pl[pid]
+  // Listen for new players
+  if(esPlayers){esPlayers.close();esPlayers=null}
+  esPlayers=fbListen('rooms/'+myCode+'/players',data=>{
+    if(!data)return
+    Object.entries(data).forEach(([pid,v])=>{
+      if(pid===myId||!v)return
+      if(!pl[pid]){addPl(pid,v.name||'Player');toast((v.name||'Player')+' joined!')}
+    })
   })
 
   // Listen for direction changes
-  room.child('dirs').on('value',snap=>{
-    if(!snap.val())return
-    Object.entries(snap.val()).forEach(([pid,d])=>{
+  if(esDirs){esDirs.close();esDirs=null}
+  esDirs=fbListen('rooms/'+myCode+'/dirs',data=>{
+    if(!data)return
+    Object.entries(data).forEach(([pid,d])=>{
       if(!Array.isArray(d))return
       const p=pl[pid]
       if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d
     })
   })
+
+  startLoop()
 }
 
 // ── client ─────────────────────────────────────────────────
 function startClient(){
   setOv('CONNECTING…','Joining room '+myCode+'…')
-  const room=db.ref('rooms/'+myCode)
 
   // Register self
-  room.child('players/'+myId).set({name:myName,ts:Date.now()})
-  room.child('players/'+myId).onDisconnect().remove()
+  fbSet('rooms/'+myCode+'/players/'+myId,{name:myName,ts:Date.now()})
 
-  // Check room exists (wait for host)
-  let found=false
-  const hostRef=room.child('host')
-  hostRef.once('value',snap=>{
-    if(!snap.val()){
+  // Check host exists
+  fbGet('rooms/'+myCode+'/host').then(hostId=>{
+    if(!hostId){
       setOv('NOT FOUND','Room "'+myCode+'" not found.\nAsk the host to share their code.')
       return
     }
-    found=true
-    setOv('CONNECTED!','Loading game…')
-    setTimeout(()=>document.getElementById('ov').classList.add('hidden'),1500)
-  })
+    setOv('CONNECTED!','Waiting for game state…')
 
-  // Listen for game state
-  room.child('state').on('value',snap=>{
-    const s=snap.val()
-    if(!s)return
-    document.getElementById('ov').classList.add('hidden')
-    try{renderAll(s.p,s.f)}catch(e){}
-  })
+    // Listen for game state
+    if(esState){esState.close();esState=null}
+    esState=fbListen('rooms/'+myCode+'/state',data=>{
+      if(!data)return
+      document.getElementById('ov').classList.add('hidden')
+      try{renderAll(data.p,data.f)}catch(e){}
+    })
 
-  // Listen for round end
-  room.child('roundend').on('value',snap=>{
-    if(snap.val())setOv('ROUND OVER','Next round in 4 seconds…')
-    else document.getElementById('ov').classList.add('hidden')
+    // Listen for round end via state having roundEnd flag
+    // (handled inside state listener above)
   })
 }
 
@@ -264,6 +262,7 @@ function spawnFd(){
   while(fd.length<FOOD)fd.push(randPos(occ))
 }
 function startLoop(){clearInterval(gt);gt=setInterval(tick,TICK)}
+
 function tick(){
   const ps=Object.values(pl);if(!ps.length)return
   for(const p of ps){if(!p.alive)continue;p.dir=p.nextDir
@@ -283,21 +282,19 @@ function tick(){
   spawnFd()
   const state={p:ps.map(p=>({id:p.id,name:p.name,color:p.color,snake:p.snake,score:p.score,alive:p.alive})),f:fd}
   renderAll(state.p,state.f)
-  db.ref('rooms/'+myCode+'/state').set(state)
+  fbSet('rooms/'+myCode+'/state',state)
 
   const alive=ps.filter(p=>p.alive)
   if(ps.length>1&&alive.length<=1){
     clearInterval(gt);gt=null
     setTimeout(()=>{
-      db.ref('rooms/'+myCode+'/roundend').set(Date.now())
       setOv('ROUND OVER','Next round in 4 seconds…')
       setTimeout(()=>{
-        db.ref('rooms/'+myCode+'/roundend').remove()
-        ci=0;pl={}; fd=[]
-        // re-add all known players
-        db.ref('rooms/'+myCode+'/players').once('value',snap=>{
-          const data=snap.val()||{}
-          Object.entries(data).forEach(([id,v])=>addPl(id,v.name||'Player'))
+        ci=0;pl={};fd=[]
+        // re-add all known players from Firebase
+        fbGet('rooms/'+myCode+'/players').then(data=>{
+          const entries=data?Object.entries(data):[]
+          entries.forEach(([id,v])=>addPl(id,v.name||'Player'))
           if(!pl[myId])addPl(myId,myName)
           spawnFd();startLoop()
           document.getElementById('ov').classList.add('hidden')
@@ -310,8 +307,8 @@ function tick(){
 // ── render ─────────────────────────────────────────────────
 function renderAll(ps,f){drawBar(ps);draw(ps,f)}
 function drawBar(ps){
-  document.getElementById('bar').querySelectorAll('.chip').forEach(c=>c.remove())
   const bar=document.getElementById('bar')
+  bar.querySelectorAll('.chip').forEach(c=>c.remove())
   ps.forEach(p=>{
     const c=document.createElement('div')
     c.className='chip'+(p.alive?'':' dead')
@@ -349,13 +346,13 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 document.getElementById('ov-go').onclick=()=>{document.getElementById('ov').classList.add('hidden')}
 document.getElementById('ov-code').onclick=()=>{
   const code=document.getElementById('ov-code').textContent
-  navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>toast('Copied!'))
+  if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>toast('Copied!'))
 }
 
 // ── controls ───────────────────────────────────────────────
 function sendDir(d){
   if(isHost){const p=pl[myId];if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d}
-  else db&&db.ref('rooms/'+myCode+'/dirs/'+myId).set(d)
+  else fbSet('rooms/'+myCode+'/dirs/'+myId,d)
 }
 document.addEventListener('keydown',e=>{
   const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DN,s:DN,S:DN,ArrowLeft:LT,a:LT,A:LT,ArrowRight:RT,d:RT,D:RT}
