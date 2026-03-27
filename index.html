@@ -93,7 +93,7 @@
 
 <div id="toast"></div>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const TILE=20,COLS=30,ROWS=24,TICK=120,FOOD=3;
 const COLORS=['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8'];
@@ -113,18 +113,21 @@ let gameTimer=null,colorIdx=0,players={},food=[];
 
 // ---- Lobby ----
 document.getElementById('btn-create').addEventListener('click',()=>{
-  myName=name();if(!myName)return;
+  myName=getName();
   showGame(); createRoom();
 });
 document.getElementById('btn-join').addEventListener('click',()=>{
-  myName=name();const code=document.getElementById('inp-code').value.trim().toUpperCase();
-  if(!myName||!code)return;
+  const code=document.getElementById('inp-code').value.trim().toUpperCase();
+  if(!code){alert('Enter a room code first.');return;}
+  myName=getName();
   showGame(); joinRoom(code);
 });
 document.getElementById('inp-code').addEventListener('keydown',e=>{
   if(e.key==='Enter')document.getElementById('btn-join').click();
 });
-function name(){return document.getElementById('inp-name').value.trim().substring(0,14)||'';}
+function getName(){
+  return document.getElementById('inp-name').value.trim().substring(0,14)||'Player'+Math.floor(Math.random()*99+1);
+}
 function showGame(){lobbyEl.style.display='none';gameEl.style.display='flex';}
 
 // ---- Create Room (host) ----
