@@ -15,67 +15,55 @@
     .screen.active{display:flex;}
 
     h1{font-size:clamp(2rem,10vw,3.5rem);color:#32c832;letter-spacing:8px;}
-    p{color:#555;font-size:.83rem;text-align:center;line-height:1.6;max-width:300px;}
 
     input{background:#111;border:2px solid #333;border-radius:8px;color:#fff;
       font-family:inherit;font-size:.95rem;padding:11px 14px;
-      width:min(320px,92vw);text-align:center;outline:none;}
+      width:min(300px,90vw);text-align:center;outline:none;}
     input:focus{border-color:#32c832;}
+
     .btn{background:#32c832;color:#000;border:none;border-radius:8px;
       font-family:inherit;font-weight:bold;font-size:1rem;
-      padding:14px 0;cursor:pointer;width:min(320px,92vw);}
+      padding:14px 0;cursor:pointer;width:min(300px,90vw);}
     .btn:active{background:#28a828;}
     .btn.sec{background:transparent;color:#32c832;border:2px solid #333;}
     .btn.sec:active{background:#0a140a;}
-    .sep{color:#222;font-size:.8rem;}
 
-    /* Game */
+    /* Game screen */
     #game{flex-direction:column;align-items:center;width:100%;height:100dvh;overflow:hidden;}
-    #bar{display:flex;align-items:center;justify-content:center;
-      width:100%;padding:4px 8px;gap:6px;flex-wrap:wrap;min-height:34px;position:relative;}
-    .chip{display:flex;align-items:center;gap:4px;background:#0d0d0d;
-      border-radius:20px;padding:2px 8px;font-size:.73rem;}
-    .chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-    .chip.dead{opacity:.28;text-decoration:line-through;}
-    #rlbl{font-size:.65rem;color:#2a2a2a;}
-    #bar-btns{position:absolute;right:8px;top:50%;transform:translateY(-50%);
-      display:flex;gap:4px;}
-    #bar-btns button{background:#111;border:1px solid #222;border-radius:6px;
-      color:#555;font-size:.65rem;font-family:inherit;padding:3px 7px;cursor:pointer;}
-    #bar-btns button:active{background:#1a1a1a;color:#32c832;}
 
-    #cw{position:relative;width:min(100vw, calc(100dvh - 168px) * 1.25);}
+    #bar{display:flex;align-items:center;justify-content:space-between;
+      width:100%;padding:6px 12px;min-height:36px;}
+    #score-lbl{font-size:.85rem;color:#32c832;}
+    #bar-btns{display:flex;gap:6px;}
+    #bar-btns button{background:#111;border:1px solid #222;border-radius:6px;
+      color:#555;font-size:.65rem;font-family:inherit;padding:4px 9px;cursor:pointer;}
+    #bar-btns button:active{color:#32c832;background:#1a1a1a;}
+
+    #cw{position:relative;width:min(100vw, calc(100dvh - 180px) * 1.25);}
     canvas{border:2px solid #111;background:#050505;display:block;width:100%;height:auto;touch-action:none;}
 
+    /* Overlay */
     #ov{position:absolute;inset:0;display:flex;flex-direction:column;
       align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.92);}
     #ov.hidden{display:none;}
-    #ov-t{font-size:clamp(1rem,5vw,1.6rem);color:#32c832;letter-spacing:2px;}
-    #ov-p{color:#555;font-size:.82rem;text-align:center;padding:0 16px;white-space:pre-line;}
-    #ov-code{font-size:clamp(1.8rem,8vw,2.8rem);color:#fff;letter-spacing:10px;
-      background:#111;border:2px solid #222;padding:10px 24px;border-radius:8px;cursor:pointer;display:none;}
-    #ov-hint{font-size:.68rem;color:#2a2a2a;}
-    #ov-go{background:#32c832;color:#000;border:none;border-radius:8px;
-      font-family:inherit;font-weight:bold;font-size:1rem;padding:13px 40px;cursor:pointer;display:none;}
-    #ov-go:active{background:#28a828;}
-    #ov-btns{display:none;gap:10px;flex-wrap:wrap;justify-content:center;}
-    #ov-btns button{background:transparent;color:#32c832;border:2px solid #333;border-radius:8px;
-      font-family:inherit;font-weight:bold;font-size:.9rem;padding:11px 24px;cursor:pointer;}
-    #ov-btns button:active{background:#0a140a;}
+    #ov-title{font-size:clamp(1.2rem,5vw,1.8rem);color:#32c832;letter-spacing:3px;}
+    #ov-score{font-size:clamp(.9rem,3vw,1.1rem);color:#555;}
+    #ov-play{background:#32c832;color:#000;border:none;border-radius:8px;
+      font-family:inherit;font-weight:bold;font-size:1rem;padding:13px 40px;cursor:pointer;}
+    #ov-play:active{background:#28a828;}
+    #ov-home{background:transparent;color:#32c832;border:2px solid #333;border-radius:8px;
+      font-family:inherit;font-weight:bold;font-size:.9rem;padding:11px 30px;cursor:pointer;}
+    #ov-home:active{background:#0a140a;}
 
+    /* D-pad */
     #dpad{display:grid;grid-template-areas:'. u .' 'l . r' '. d .';
       grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);
-      gap:5px;margin-top:8px;flex-shrink:0;}
+      gap:5px;margin-top:10px;flex-shrink:0;}
     #dpad button{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;
       color:#32c832;font-size:1.2rem;cursor:pointer;display:flex;
       align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;}
     #dpad button:active{background:#151515;border-color:#32c832;}
     #du{grid-area:u;}#dl{grid-area:l;}#dr{grid-area:r;}#dd{grid-area:d;}
-
-    #toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
-      background:#111;color:#777;padding:5px 14px;border-radius:14px;
-      font-size:.73rem;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:9;}
-    #toast.show{opacity:1;}
   </style>
 </head>
 <body>
@@ -84,18 +72,13 @@
 <div id="lobby" class="screen">
   <h1>SNEAK</h1>
   <input id="iname" maxlength="14" placeholder="Your name (optional)" autocomplete="off"/>
-  <button class="btn" id="bsolo">PLAY SOLO</button>
-  <span class="sep">— multiplayer —</span>
-  <button class="btn sec" id="bcreate">CREATE ROOM</button>
-  <input id="icode" maxlength="4" placeholder="Room code"
-    style="text-transform:uppercase;letter-spacing:8px;font-size:1.4rem;" autocomplete="off"/>
-  <button class="btn sec" id="bjoin">JOIN ROOM</button>
+  <button class="btn" id="bplay">PLAY</button>
 </div>
 
 <!-- GAME -->
 <div id="game" class="screen">
   <div id="bar">
-    <span id="rlbl"></span>
+    <span id="score-lbl">Score: 0</span>
     <div id="bar-btns">
       <button id="bbtn-restart">RESTART</button>
       <button id="bbtn-home">HOME</button>
@@ -103,360 +86,170 @@
   </div>
   <div id="cw">
     <canvas id="c"></canvas>
-    <div id="ov">
-      <div id="ov-t">LOADING</div>
-      <div id="ov-p"></div>
-      <div id="ov-code"></div>
-      <div id="ov-hint"></div>
-      <button id="ov-go">START PLAYING ▶</button>
-      <div id="ov-btns">
-        <button id="ov-restart">RESTART</button>
-        <button id="ov-home">HOME</button>
-      </div>
+    <div id="ov" class="hidden">
+      <div id="ov-title">GAME OVER</div>
+      <div id="ov-score"></div>
+      <button id="ov-play">PLAY AGAIN</button>
+      <button id="ov-home">HOME</button>
     </div>
   </div>
   <div id="dpad">
-    <button id="du">▲</button><button id="dl">◀</button>
-    <button id="dr">▶</button><button id="dd">▼</button>
+    <button id="du">▲</button>
+    <button id="dl">◀</button>
+    <button id="dr">▶</button>
+    <button id="dd">▼</button>
   </div>
 </div>
-<div id="toast"></div>
 
 <script>
-// ── constants ──────────────────────────────────────────────
-const TILE=20,COLS=30,ROWS=24,TICK=150,FOOD=3
-const COLORS=['#32c832','#e03232','#3264e0','#e0c832','#c832c8','#32c8c8']
-const STARTS=[[5,5],[25,5],[5,18],[25,18],[15,5],[15,18]]
-const UP=[0,-1],DN=[0,1],LT=[-1,0],RT=[1,0]
-const FB='https://sneak-3c9c1-default-rtdb.asia-southeast1.firebasedatabase.app'
-const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ'
+const TILE=20, COLS=30, ROWS=24, TICK=130, FOOD=3
+const UP=[0,-1], DN=[0,1], LT=[-1,0], RT=[1,0]
 
-// ── dom ────────────────────────────────────────────────────
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d')
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d')
 canvas.width=COLS*TILE; canvas.height=ROWS*TILE
 
-// ── state ──────────────────────────────────────────────────
-let myId=null,isHost=false,isSolo=false,myCode='',myName=''
-let gt=null,ci=0,pl={},fd=[]
-let esState=null,esDirs=null,esPlayers=null
+let snake, dir, nextDir, food, score, gt, playerName
 
-// ── firebase REST helpers ──────────────────────────────────
-function fbSet(path,data){
-  if(isSolo)return Promise.resolve()
-  return fetch(FB+'/'+path+'.json',{method:'PUT',body:JSON.stringify(data),
-    headers:{'Content-Type':'application/json'}}).catch(()=>{})
-}
-function fbGet(path){
-  return fetch(FB+'/'+path+'.json').then(r=>r.json()).catch(()=>null)
-}
-function fbDel(path){
-  return fetch(FB+'/'+path+'.json',{method:'DELETE'}).catch(()=>{})
-}
-function fbListen(path,cb){
-  const es=new EventSource(FB+'/'+path+'.json')
-  es.addEventListener('put',e=>{try{cb(JSON.parse(e.data).data)}catch(err){}})
-  es.addEventListener('patch',e=>{try{cb(JSON.parse(e.data).data)}catch(err){}})
-  es.onerror=()=>{}
-  return es
-}
-
-// ── screens ────────────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
 }
 showScreen('lobby')
 
-// ── lobby ──────────────────────────────────────────────────
-document.getElementById('bsolo').onclick=()=>{
-  myName=getName()
-  myId='p'+Date.now()
-  isHost=true; isSolo=true
-  showScreen('game')
-  document.getElementById('rlbl').textContent='Solo'
-  document.getElementById('bbtn-restart').style.display=''
-  resetAndStart()
-}
-document.getElementById('bcreate').onclick=()=>{
-  myName=getName()
-  myCode=randCode()
-  myId='p'+Date.now()+Math.random().toString(36).slice(2,6)
-  isHost=true; isSolo=false
-  document.getElementById('bbtn-restart').style.display=''
-  showScreen('game')
-  startHost()
-}
-document.getElementById('bjoin').onclick=()=>{
-  const code=document.getElementById('icode').value.trim().toUpperCase()
-  if(!code){alert('Enter a room code.');return}
-  myName=getName()
-  myCode=code
-  myId='p'+Date.now()+Math.random().toString(36).slice(2,6)
-  isHost=false; isSolo=false
-  document.getElementById('bbtn-restart').style.display='none'
-  showScreen('game')
-  startClient()
-}
-document.getElementById('icode').onkeydown=e=>{if(e.key==='Enter')document.getElementById('bjoin').click()}
+document.getElementById('bplay').onclick=startGame
+document.getElementById('iname').onkeydown=e=>{if(e.key==='Enter')startGame()}
 
-function getName(){return document.getElementById('iname').value.trim().slice(0,14)||'Player'+~~(Math.random()*99+1)}
-function randCode(){
-  let c=''
-  for(let i=0;i<4;i++)c+=CODE_CHARS[~~(Math.random()*CODE_CHARS.length)]
-  return c
+function startGame(){
+  playerName=document.getElementById('iname').value.trim().slice(0,14)||'Player'
+  showScreen('game')
+  restartGame()
 }
 
-// ── home / restart ─────────────────────────────────────────
-function goHome(){
-  clearInterval(gt);gt=null
-  if(esState){esState.close();esState=null}
-  if(esDirs){esDirs.close();esDirs=null}
-  if(esPlayers){esPlayers.close();esPlayers=null}
-  isSolo=false;isHost=false;myId=null;myCode='';myName=''
-  ci=0;pl={};fd=[]
+function restartGame(){
+  snake=[[15,12],[14,12],[13,12]]
+  dir=RT; nextDir=RT
+  food=[]; score=0
+  spawnFood()
+  updateScore()
   document.getElementById('ov').classList.add('hidden')
-  document.getElementById('ov-go').style.display='none'
-  document.getElementById('ov-code').style.display='none'
-  document.getElementById('ov-btns').style.display='none'
+  clearInterval(gt)
+  gt=setInterval(tick,TICK)
+}
+
+function goHome(){
+  clearInterval(gt); gt=null
+  document.getElementById('ov').classList.add('hidden')
   showScreen('lobby')
 }
-function doRestart(){
-  if(!isHost)return
-  clearInterval(gt);gt=null
-  document.getElementById('ov-btns').style.display='none'
-  if(isSolo){
-    resetAndStart()
-  } else {
-    ci=0;pl={};fd=[]
-    fbGet('rooms/'+myCode+'/players').then(data=>{
-      const entries=data?Object.entries(data):[]
-      entries.forEach(([id,v])=>addPl(id,v.name||'Player'))
-      if(!pl[myId])addPl(myId,myName)
-      spawnFd();startLoop()
-      document.getElementById('ov').classList.add('hidden')
-    })
+
+document.getElementById('bbtn-restart').onclick=restartGame
+document.getElementById('bbtn-home').onclick=goHome
+document.getElementById('ov-play').onclick=restartGame
+document.getElementById('ov-home').onclick=goHome
+
+// Game logic
+function spawnFood(){
+  const occ=new Set(snake.map(([x,y])=>x+','+y))
+  food.forEach(([x,y])=>occ.add(x+','+y))
+  while(food.length<FOOD){
+    let p
+    do{p=[~~(Math.random()*COLS),~~(Math.random()*ROWS)]}
+    while(occ.has(p[0]+','+p[1]))
+    food.push(p); occ.add(p[0]+','+p[1])
   }
 }
-function resetAndStart(){
-  ci=0;pl={};fd=[]
-  addPl(myId,myName)
-  spawnFd()
-  document.getElementById('ov').classList.add('hidden')
-  startLoop()
-}
-
-document.getElementById('bbtn-home').onclick=goHome
-document.getElementById('bbtn-restart').onclick=doRestart
-document.getElementById('ov-home').onclick=goHome
-document.getElementById('ov-restart').onclick=doRestart
-
-// ── host ───────────────────────────────────────────────────
-function startHost(){
-  setOv('YOUR ROOM CODE','Share this 4-letter code:')
-  const ovCode=document.getElementById('ov-code')
-  ovCode.textContent=myCode; ovCode.style.display='block'
-  document.getElementById('ov-hint').textContent='Tap code to copy'
-  document.getElementById('ov-go').style.display='block'
-  document.getElementById('rlbl').textContent='Room: '+myCode
-
-  ci=0; pl={}; fd=[]
-  addPl(myId,myName)
-  spawnFd()
-
-  fbSet('rooms/'+myCode+'/host',myId)
-  fbDel('rooms/'+myCode+'/state')
-  fbDel('rooms/'+myCode+'/dirs')
-  fbSet('rooms/'+myCode+'/players/'+myId,{name:myName,ts:Date.now()})
-
-  if(esPlayers){esPlayers.close();esPlayers=null}
-  esPlayers=fbListen('rooms/'+myCode+'/players',data=>{
-    if(!data)return
-    Object.entries(data).forEach(([pid,v])=>{
-      if(pid===myId||!v)return
-      if(!pl[pid]){addPl(pid,v.name||'Player');toast((v.name||'Player')+' joined!')}
-    })
-  })
-
-  if(esDirs){esDirs.close();esDirs=null}
-  esDirs=fbListen('rooms/'+myCode+'/dirs',data=>{
-    if(!data)return
-    Object.entries(data).forEach(([pid,d])=>{
-      if(!Array.isArray(d))return
-      const p=pl[pid]
-      if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d
-    })
-  })
-
-  startLoop()
-}
-
-// ── client ─────────────────────────────────────────────────
-function startClient(){
-  setOv('CONNECTING…','Joining room '+myCode+'…')
-  fbSet('rooms/'+myCode+'/players/'+myId,{name:myName,ts:Date.now()})
-  fbGet('rooms/'+myCode+'/host').then(hostId=>{
-    if(!hostId){
-      setOv('NOT FOUND','Room "'+myCode+'" not found.\nCheck the code and try again.')
-      document.getElementById('ov-btns').style.display='flex'
-      document.getElementById('ov-restart').style.display='none'
-      return
-    }
-    setOv('CONNECTED!','Waiting for game state…')
-    if(esState){esState.close();esState=null}
-    esState=fbListen('rooms/'+myCode+'/state',data=>{
-      if(!data)return
-      document.getElementById('ov').classList.add('hidden')
-      try{renderAll(data.p,data.f)}catch(e){}
-    })
-  })
-}
-
-// ── game logic ─────────────────────────────────────────────
-function addPl(id,name){
-  if(pl[id])return
-  const i=ci++
-  pl[id]={id,name,color:COLORS[i%COLORS.length],
-    snake:[STARTS[i%STARTS.length].slice()],dir:RT,nextDir:RT,score:0,alive:true}
-}
-function opp(a,b){return a[0]===-b[0]&&a[1]===-b[1]}
-function randPos(ex){
-  let p;do{p=[~~(Math.random()*COLS),~~(Math.random()*ROWS)]}
-  while(ex.has(p[0]+','+p[1]));return p
-}
-function cells(){
-  const s=new Set()
-  for(const p of Object.values(pl))for(const[x,y]of p.snake)s.add(x+','+y)
-  return s
-}
-function spawnFd(){
-  const occ=cells();fd.forEach(([x,y])=>occ.add(x+','+y))
-  while(fd.length<FOOD)fd.push(randPos(occ))
-}
-function startLoop(){clearInterval(gt);gt=setInterval(tick,TICK)}
 
 function tick(){
-  const ps=Object.values(pl);if(!ps.length)return
-  for(const p of ps){if(!p.alive)continue;p.dir=p.nextDir
-    p.nh=[p.snake[0][0]+p.dir[0],p.snake[0][1]+p.dir[1]]}
-  for(const p of ps){if(!p.alive)continue
-    const[hx,hy]=p.nh
-    if(hx<0||hx>=COLS||hy<0||hy>=ROWS){p.alive=false;continue}
-    if(p.snake.slice(1,-1).some(([x,y])=>x===hx&&y===hy)){p.alive=false;continue}
-    for(const o of ps){if(o.id===p.id||!o.alive)continue
-      if(o.snake.some(([x,y])=>x===hx&&y===hy)){p.alive=false;break}}
-  }
-  for(const p of ps){if(!p.alive)continue
-    p.snake.unshift(p.nh)
-    const fi=fd.findIndex(([fx,fy])=>fx===p.nh[0]&&fy===p.nh[1])
-    if(fi!==-1){p.score+=10;fd.splice(fi,1)}else p.snake.pop()
-  }
-  spawnFd()
-  const state={p:ps.map(p=>({id:p.id,name:p.name,color:p.color,snake:p.snake,score:p.score,alive:p.alive})),f:fd}
-  renderAll(state.p,state.f)
-  fbSet('rooms/'+myCode+'/state',state)
+  dir=nextDir
+  const head=[snake[0][0]+dir[0], snake[0][1]+dir[1]]
 
-  const alive=ps.filter(p=>p.alive)
+  // Wall collision
+  if(head[0]<0||head[0]>=COLS||head[1]<0||head[1]>=ROWS){gameOver();return}
+  // Self collision
+  if(snake.some(([x,y])=>x===head[0]&&y===head[1])){gameOver();return}
 
-  // Solo game over
-  if(isSolo&&alive.length===0){
-    clearInterval(gt);gt=null
-    setTimeout(()=>{
-      setOv('GAME OVER','Score: '+ps[0].score)
-      document.getElementById('ov-btns').style.display='flex'
-      document.getElementById('ov-restart').style.display=''
-    },300)
-    return
-  }
+  snake.unshift(head)
+  const fi=food.findIndex(([fx,fy])=>fx===head[0]&&fy===head[1])
+  if(fi!==-1){score+=10;food.splice(fi,1);spawnFood()}
+  else snake.pop()
 
-  // Multiplayer round over
-  if(!isSolo&&ps.length>1&&alive.length<=1){
-    clearInterval(gt);gt=null
-    setTimeout(()=>{
-      setOv('ROUND OVER','Next round in 4 seconds…')
-      setTimeout(()=>{
-        ci=0;pl={};fd=[]
-        fbGet('rooms/'+myCode+'/players').then(data=>{
-          const entries=data?Object.entries(data):[]
-          entries.forEach(([id,v])=>addPl(id,v.name||'Player'))
-          if(!pl[myId])addPl(myId,myName)
-          spawnFd();startLoop()
-          document.getElementById('ov').classList.add('hidden')
-        })
-      },4000)
-    },600)
-  }
+  updateScore()
+  draw()
 }
 
-// ── render ─────────────────────────────────────────────────
-function renderAll(ps,f){drawBar(ps);draw(ps,f)}
-function drawBar(ps){
-  const bar=document.getElementById('bar')
-  bar.querySelectorAll('.chip').forEach(c=>c.remove())
-  ps.forEach(p=>{
-    const c=document.createElement('div')
-    c.className='chip'+(p.alive?'':' dead')
-    c.innerHTML='<span class="dot" style="background:'+p.color+'"></span>'+
-      '<span>'+esc(p.name)+'</span>'+
-      '<span style="color:'+p.color+';margin-left:3px">'+p.score+'</span>'
-    bar.insertBefore(c,document.getElementById('bar-btns'))
-  })
-  bar.insertBefore(document.getElementById('rlbl'),document.getElementById('bar-btns'))
+function gameOver(){
+  clearInterval(gt); gt=null
+  draw()
+  document.getElementById('ov-title').textContent='GAME OVER'
+  document.getElementById('ov-score').textContent=playerName+' — Score: '+score
+  document.getElementById('ov').classList.remove('hidden')
 }
-function draw(ps,f){
+
+function updateScore(){
+  document.getElementById('score-lbl').textContent='Score: '+score
+}
+
+// Drawing
+function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height)
-  ctx.strokeStyle='#111';ctx.lineWidth=.5
+
+  // Grid
+  ctx.strokeStyle='#0d0d0d'; ctx.lineWidth=.5
   for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,canvas.height);ctx.stroke()}
   for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(canvas.width,y*TILE);ctx.stroke()}
-  f.forEach(([fx,fy])=>{
-    const cx=fx*TILE+TILE/2,cy=fy*TILE+TILE/2
-    ctx.fillStyle='#c82828';ctx.beginPath();ctx.arc(cx,cy,TILE/2-3,0,Math.PI*2);ctx.fill()
-    ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(cx,cy,TILE/4,0,Math.PI*2);ctx.fill()
-  })
-  ;[...ps].sort((a,b)=>a.alive-b.alive).forEach(p=>{
-    ctx.globalAlpha=p.alive?1:.22
-    p.snake.forEach(([x,y],i)=>{
-      ctx.fillStyle=p.color;rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4);ctx.fill()
-      if(i>0){ctx.fillStyle=dk(p.color);rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2);ctx.fill()}
-    });ctx.globalAlpha=1
-  })
-}
-function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
-function dk(h){const n=parseInt(h.slice(1),16);return'rgb('+Math.max(0,((n>>16)&255)-60)+','+Math.max(0,((n>>8)&255)-60)+','+Math.max(0,(n&255)-60)+')'}
-function setOv(t,p){document.getElementById('ov-t').textContent=t;document.getElementById('ov-p').textContent=p;document.getElementById('ov').classList.remove('hidden')}
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-// ── overlay buttons ────────────────────────────────────────
-document.getElementById('ov-go').onclick=()=>{document.getElementById('ov').classList.add('hidden')}
-document.getElementById('ov-code').onclick=()=>{
-  const code=document.getElementById('ov-code').textContent
-  if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>toast('Copied!'))
+  // Food
+  food.forEach(([fx,fy])=>{
+    const cx=fx*TILE+TILE/2, cy=fy*TILE+TILE/2
+    ctx.fillStyle='#c82828'; ctx.beginPath(); ctx.arc(cx,cy,TILE/2-2,0,Math.PI*2); ctx.fill()
+    ctx.fillStyle='#ffd700'; ctx.beginPath(); ctx.arc(cx,cy,TILE/4,0,Math.PI*2); ctx.fill()
+  })
+
+  // Snake
+  snake.forEach(([x,y],i)=>{
+    ctx.fillStyle= i===0 ? '#32c832' : '#228822'
+    rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4); ctx.fill()
+    if(i>0){
+      ctx.fillStyle='#1a5c1a'
+      rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2); ctx.fill()
+    }
+  })
 }
 
-// ── controls ───────────────────────────────────────────────
-function sendDir(d){
-  if(isHost){const p=pl[myId];if(p&&p.alive&&!opp(d,p.dir))p.nextDir=d}
-  else fbSet('rooms/'+myCode+'/dirs/'+myId,d)
+function rr(x,y,w,h,r){
+  ctx.beginPath()
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r)
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h)
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r)
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y)
+  ctx.closePath()
 }
+
+// Controls
+function opp(a,b){return a[0]===-b[0]&&a[1]===-b[1]}
+function move(d){if(!opp(d,dir))nextDir=d}
+
 document.addEventListener('keydown',e=>{
-  const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DN,s:DN,S:DN,ArrowLeft:LT,a:LT,A:LT,ArrowRight:RT,d:RT,D:RT}
-  if(m[e.key]){sendDir(m[e.key]);e.preventDefault()}
+  const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DN,s:DN,S:DN,
+           ArrowLeft:LT,a:LT,A:LT,ArrowRight:RT,d:RT,D:RT}
+  if(m[e.key]){move(m[e.key]);e.preventDefault()}
 })
-document.getElementById('du').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(UP)})
-document.getElementById('dd').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(DN)})
-document.getElementById('dl').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(LT)})
-document.getElementById('dr').addEventListener('pointerdown',e=>{e.preventDefault();sendDir(RT)})
+
+document.getElementById('du').addEventListener('pointerdown',e=>{e.preventDefault();move(UP)})
+document.getElementById('dd').addEventListener('pointerdown',e=>{e.preventDefault();move(DN)})
+document.getElementById('dl').addEventListener('pointerdown',e=>{e.preventDefault();move(LT)})
+document.getElementById('dr').addEventListener('pointerdown',e=>{e.preventDefault();move(RT)})
+
+// Swipe on canvas
 let tx=null,ty=null
 canvas.addEventListener('touchstart',e=>{e.preventDefault();tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:false})
 canvas.addEventListener('touchend',e=>{
-  e.preventDefault();if(tx===null)return
-  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty
+  e.preventDefault(); if(tx===null)return
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty
   if(Math.abs(dx)<10&&Math.abs(dy)<10)return
-  sendDir(Math.abs(dx)>Math.abs(dy)?(dx>0?RT:LT):(dy>0?DN:UP))
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?RT:LT):(dy>0?DN:UP))
   tx=ty=null
 },{passive:false})
-
-let tt
-function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2500)}
 </script>
 </body>
 </html>
