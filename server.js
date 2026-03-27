@@ -2,49 +2,12 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { Pool } = require('pg');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-// --- PostgreSQL ---
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
-});
-
-let leaderboard = []; // in-memory cache, refreshed from DB
-
-async function initDb() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS leaderboard (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(50) NOT NULL,
-      score INTEGER NOT NULL,
-      date DATE DEFAULT CURRENT_DATE
-    )
-  `);
-  await refreshLb();
-}
-
-async function refreshLb() {
-  const { rows } = await pool.query(
-    `SELECT name, score, TO_CHAR(date, 'MM/DD/YYYY') AS date
-     FROM leaderboard ORDER BY score DESC LIMIT 20`
-  );
-  leaderboard = rows;
-}
-
-async function saveScore(name, score) {
-  await pool.query(
-    `INSERT INTO leaderboard (name, score) VALUES ($1, $2)`,
-    [name, score]
-  );
-  await refreshLb();
-}
 
 // --- Game constants ---
 const COLS = 30, ROWS = 24, TICK = 120, FOOD_COUNT = 3;
@@ -85,7 +48,7 @@ class Room {
       color: COLORS[idx],
       snake: [STARTS[idx % STARTS.length].slice()],
       dir: RIGHT, nextDir: RIGHT,
-      score: 0, alive: true, recorded: false,
+      score: 0, alive: true,
     };
   }
 
@@ -105,7 +68,7 @@ class Room {
     Object.values(this.players).forEach((p, i) => {
       p.snake = [STARTS[i % STARTS.length].slice()];
       p.dir = RIGHT; p.nextDir = RIGHT;
-      p.score = 0; p.alive = true; p.recorded = false;
+      p.score = 0; p.alive = true;
     });
     this.food = [];
     this.spawnFood();
@@ -122,31 +85,23 @@ class Room {
   tick() {
     const ps = Object.values(this.players);
 
-    // Compute next heads
     for (const p of ps) {
       if (!p.alive) continue;
       p.dir = p.nextDir;
       p.nextHead = [p.snake[0][0]+p.dir[0], p.snake[0][1]+p.dir[1]];
     }
 
-    // Build current occupied cells (tails will vacate, heads will arrive)
-    const occ = allCells(this.players);
-
-    // Check each alive player's next head
     for (const p of ps) {
       if (!p.alive) continue;
       const [hx,hy] = p.nextHead;
       if (hx<0||hx>=COLS||hy<0||hy>=ROWS) { p.alive=false; continue; }
-      // Self: check against own body minus tail (tail will move)
       if (p.snake.slice(1,-1).some(([x,y])=>x===hx&&y===hy)) { p.alive=false; continue; }
-      // Other snakes
       for (const o of ps) {
         if (o.id===p.id||!o.alive) continue;
         if (o.snake.some(([x,y])=>x===hx&&y===hy)) { p.alive=false; break; }
       }
     }
 
-    // Apply movement
     for (const p of ps) {
       if (!p.alive) continue;
       p.snake.unshift(p.nextHead);
@@ -157,28 +112,17 @@ class Room {
 
     this.spawnFood();
 
-    // Record dead players into leaderboard
-    for (const p of ps) {
-      if (!p.alive && !p.recorded) {
-        p.recorded = true;
-        if (p.score > 0) saveScore(p.name, p.score).catch(console.error);
-      }
-    }
-
-    // Broadcast state
     io.to(this.id).emit('state', {
       players: ps.map(p=>({ id:p.id, name:p.name, color:p.color, snake:p.snake, score:p.score, alive:p.alive })),
       food: this.food,
-      lb: leaderboard.slice(0,10),
     });
 
-    // Round over?
     const alive = ps.filter(p=>p.alive);
     if (ps.length > 1 && alive.length <= 1) {
       this.stop();
       setTimeout(() => {
         if (Object.keys(this.players).length > 0) {
-          io.to(this.id).emit('round_end', { lb: leaderboard.slice(0,10) });
+          io.to(this.id).emit('round_end');
           setTimeout(() => { if (Object.keys(this.players).length>0) this.start(); }, 4000);
         }
       }, 500);
@@ -201,7 +145,7 @@ io.on('connection', socket => {
     socket.join(room.id);
     room.addPlayer(socket.id, (name||'Player').substring(0,16));
     io.to(room.id).emit('msg', `${room.players[socket.id].name} joined`);
-    socket.emit('joined', { color: room.players[socket.id].color, lb: leaderboard.slice(0, 10) });
+    socket.emit('joined', { color: room.players[socket.id].color });
     if (!room.started) room.start();
   });
 
@@ -222,6 +166,4 @@ io.on('connection', socket => {
 });
 
 const PORT = process.env.PORT || 3001;
-initDb()
-  .then(() => server.listen(PORT, () => console.log(`Sneak server on port ${PORT}`)))
-  .catch(err => { console.error('DB init failed:', err); process.exit(1); });
+server.listen(PORT, () => console.log(`Sneak server on port ${PORT}`));

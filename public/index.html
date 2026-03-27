@@ -12,18 +12,17 @@
       min-height:100dvh;overflow:hidden;touch-action:none;
     }
 
-    /* --- Lobby --- */
+    /* Lobby */
     #lobby{
       display:flex;flex-direction:column;align-items:center;
       justify-content:center;gap:16px;height:100dvh;padding:20px;
     }
     #lobby h1{font-size:clamp(2rem,10vw,3.5rem);color:#32c832;letter-spacing:8px;}
-    #lobby p{color:#666;font-size:.85rem;text-align:center;}
+    #lobby p{color:#555;font-size:.85rem;text-align:center;}
     #lobby input{
       background:#111;border:2px solid #333;border-radius:8px;
       color:#fff;font-family:inherit;font-size:1rem;
-      padding:10px 16px;width:min(300px,90vw);text-align:center;
-      outline:none;
+      padding:10px 16px;width:min(300px,90vw);text-align:center;outline:none;
     }
     #lobby input:focus{border-color:#32c832;}
     #lobby button{
@@ -32,17 +31,13 @@
       padding:12px 40px;cursor:pointer;letter-spacing:1px;width:min(300px,90vw);
     }
     #lobby button:active{background:#28a828;}
-    #lb-preview{width:min(320px,90vw);}
-    #lb-preview h3{color:#aaa;font-size:.8rem;letter-spacing:2px;margin-bottom:8px;text-align:center;}
 
-    /* --- Game UI --- */
+    /* Game */
     #game{display:none;flex-direction:column;align-items:center;width:100%;}
     #topbar{
-      display:flex;align-items:center;justify-content:space-between;
+      display:flex;align-items:center;justify-content:center;
       width:min(600px,100vw);padding:6px 10px;gap:8px;flex-wrap:wrap;
     }
-    #room-tag{font-size:.75rem;color:#555;}
-    #players-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex:1;}
     .player-chip{
       display:flex;align-items:center;gap:5px;
       background:#111;border-radius:20px;padding:3px 10px;font-size:.8rem;
@@ -50,32 +45,17 @@
     .player-chip .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
     .player-chip.dead{opacity:.4;text-decoration:line-through;}
 
-    #canvas-wrap{position:relative;width:min(100vw,calc(100dvh - 220px)*1.25);}
+    #canvas-wrap{position:relative;width:min(100vw,calc(100dvh - 180px)*1.25);}
     canvas{border:2px solid #222;background:#0a0a0a;display:block;width:100%;height:auto;touch-action:none;}
 
-    /* Overlay */
     #overlay{
       position:absolute;inset:0;display:flex;flex-direction:column;
       align-items:center;justify-content:center;gap:12px;
       background:rgba(0,0,0,.75);
     }
     #overlay.hidden{display:none;}
-    #overlay h2{font-size:clamp(1.2rem,5vw,1.8rem);color:#e03232;}
-    #overlay p{color:#aaa;font-size:.9rem;text-align:center;padding:0 12px;}
-
-    /* Leaderboard panel */
-    #lb-panel{
-      width:min(600px,100vw);padding:6px 10px;
-    }
-    #lb-panel h3{font-size:.7rem;color:#555;letter-spacing:2px;margin-bottom:4px;}
-    #lb-list{display:flex;gap:6px;flex-wrap:wrap;}
-    .lb-entry{
-      background:#111;border-radius:6px;padding:3px 8px;
-      font-size:.75rem;display:flex;gap:6px;align-items:center;
-    }
-    .lb-rank{color:#555;}
-    .lb-name{color:#fff;}
-    .lb-score{color:#32c832;font-weight:bold;}
+    #overlay h2{font-size:clamp(1.2rem,5vw,1.8rem);color:#32c832;}
+    #overlay p{color:#aaa;font-size:.9rem;}
 
     /* D-pad */
     #dpad{
@@ -99,42 +79,29 @@
     #toast{
       position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
       background:#222;color:#aaa;padding:6px 16px;border-radius:20px;
-      font-size:.8rem;opacity:0;transition:opacity .3s;pointer-events:none;
+      font-size:.8rem;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
     }
     #toast.show{opacity:1;}
   </style>
 </head>
 <body>
 
-<!-- LOBBY -->
 <div id="lobby">
   <h1>SNEAK</h1>
-  <p>Multiplayer Snake — share the Room ID with friends</p>
+  <p>Share the same Room ID with friends to play together</p>
   <input id="inp-name" maxlength="16" placeholder="Your name" autocomplete="off"/>
   <input id="inp-room" maxlength="20" placeholder="Room ID (e.g. room1)" autocomplete="off"/>
   <button id="btn-join">JOIN GAME</button>
-  <div id="lb-preview">
-    <h3>🏆 TOP SCORES</h3>
-    <div id="lb-preview-list"></div>
-  </div>
 </div>
 
-<!-- GAME -->
 <div id="game">
-  <div id="topbar">
-    <span id="room-tag"></span>
-    <div id="players-bar"></div>
-  </div>
+  <div id="topbar" id="players-bar"></div>
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
     <div id="overlay" class="hidden">
       <h2 id="ov-title"></h2>
       <p id="ov-msg"></p>
     </div>
-  </div>
-  <div id="lb-panel">
-    <h3>LEADERBOARD</h3>
-    <div id="lb-list"></div>
   </div>
   <div id="dpad">
     <button id="btn-up">▲</button>
@@ -158,15 +125,11 @@ const gameEl=document.getElementById('game');
 const overlay=document.getElementById('overlay');
 const ovTitle=document.getElementById('ov-title');
 const ovMsg=document.getElementById('ov-msg');
-const lbList=document.getElementById('lb-list');
-const lbPreviewList=document.getElementById('lb-preview-list');
-const playersBar=document.getElementById('players-bar');
-const roomTag=document.getElementById('room-tag');
+const topbar=document.getElementById('topbar');
 
-let myId=null, myColor=null;
 const socket=io();
 
-// --- Lobby ---
+// Lobby
 document.getElementById('btn-join').addEventListener('click', join);
 document.getElementById('inp-room').addEventListener('keydown', e=>{ if(e.key==='Enter') join(); });
 document.getElementById('inp-name').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('inp-room').focus(); });
@@ -177,72 +140,60 @@ function join(){
   socket.emit('join',{roomId,name});
 }
 
-socket.on('joined',({color,lb})=>{
-  myId=socket.id; myColor=color;
+socket.on('joined', ()=>{
   lobby.style.display='none';
   gameEl.style.display='flex';
-  roomTag.textContent='Room: '+document.getElementById('inp-room').value.trim()||'main';
-  renderLb(lb, lbList);
 });
 
 socket.on('msg', text=>toast(text));
 
-socket.on('round_end',({lb})=>{
-  renderLb(lb,lbList);
-  showOverlay('ROUND OVER','Next round starting in 4 seconds…');
+socket.on('round_end', ()=>{
+  showOverlay('ROUND OVER','Next round in 4 seconds…');
 });
 
-// --- Game state ---
-socket.on('state',({players,food,lb})=>{
+// Game state
+socket.on('state',({players,food})=>{
   overlay.classList.add('hidden');
-  renderLb(lb,lbList);
-  renderPlayers(players);
-  drawGame(players,food);
+  renderTopbar(players);
+  draw(players,food);
 });
 
-function renderPlayers(players){
-  playersBar.innerHTML='';
+function renderTopbar(players){
+  topbar.innerHTML='';
   players.forEach(p=>{
     const chip=document.createElement('div');
     chip.className='player-chip'+(p.alive?'':' dead');
-    chip.innerHTML=`<span class="dot" style="background:${p.color}"></span><span>${esc(p.name)}</span><span style="color:${p.color}">${p.score}</span>`;
-    playersBar.appendChild(chip);
+    chip.innerHTML=`<span class="dot" style="background:${p.color}"></span><span>${esc(p.name)}</span><span style="color:${p.color};margin-left:4px">${p.score}</span>`;
+    topbar.appendChild(chip);
   });
 }
 
-function renderLb(lb, container){
-  container.innerHTML='';
-  lb.forEach((e,i)=>{
-    const el=document.createElement('div');
-    el.className='lb-entry';
-    el.innerHTML=`<span class="lb-rank">#${i+1}</span><span class="lb-name">${esc(e.name)}</span><span class="lb-score">${e.score}</span>`;
-    container.appendChild(el);
-  });
-}
-
-function drawGame(players,food){
+function draw(players,food){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
   // Grid
   ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=0.5;
   for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,canvas.height);ctx.stroke();}
   for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(canvas.width,y*TILE);ctx.stroke();}
+
   // Food
   food.forEach(([fx,fy])=>{
-    const cx=fx*TILE+TILE/2,cy=fy*TILE+TILE/2;
+    const cx=fx*TILE+TILE/2, cy=fy*TILE+TILE/2;
     ctx.fillStyle='#dc3232';
     ctx.beginPath();ctx.arc(cx,cy,TILE/2-3,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#ffdc00';
     ctx.beginPath();ctx.arc(cx,cy,TILE/4,0,Math.PI*2);ctx.fill();
   });
-  // Snakes (draw dead first, alive on top)
+
+  // Snakes — dead first, alive on top
   [...players].sort((a,b)=>a.alive-b.alive).forEach(p=>{
-    ctx.globalAlpha=p.alive?1:0.35;
+    ctx.globalAlpha=p.alive?1:0.3;
     p.snake.forEach(([x,y],i)=>{
       ctx.fillStyle=p.color;
-      rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4);ctx.fill();
+      rr(x*TILE+1,y*TILE+1,TILE-2,TILE-2,4); ctx.fill();
       if(i>0){
         ctx.fillStyle=darken(p.color);
-        rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2);ctx.fill();
+        rr(x*TILE+5,y*TILE+5,TILE-10,TILE-10,2); ctx.fill();
       }
     });
     ctx.globalAlpha=1;
@@ -263,10 +214,12 @@ function rr(x,y,w,h,r){
 }
 
 function showOverlay(title,msg){ovTitle.textContent=title;ovMsg.textContent=msg;overlay.classList.remove('hidden');}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-// --- Controls ---
+// Controls
 const UP=[0,-1],DOWN=[0,1],LEFT=[-1,0],RIGHT=[1,0];
 function send(d){socket.emit('dir',d);}
+
 document.addEventListener('keydown',e=>{
   const m={ArrowUp:UP,w:UP,W:UP,ArrowDown:DOWN,s:DOWN,S:DOWN,ArrowLeft:LEFT,a:LEFT,A:LEFT,ArrowRight:RIGHT,d:RIGHT,D:RIGHT};
   if(m[e.key]){send(m[e.key]);e.preventDefault();}
@@ -286,7 +239,7 @@ canvas.addEventListener('touchend',e=>{
   tx=ty=null;
 },{passive:false});
 
-// --- Toast ---
+// Toast
 let toastTimer;
 function toast(msg){
   const el=document.getElementById('toast');
@@ -294,13 +247,9 @@ function toast(msg){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-// --- Leaderboard preview in lobby ---
-socket.on('connect',()=>{});
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-
-// Pre-fill room from URL hash
+// Auto-fill room from URL hash
 const hash=location.hash.slice(1);
-if(hash)document.getElementById('inp-room').value=hash;
+if(hash) document.getElementById('inp-room').value=hash;
 </script>
 </body>
 </html>
