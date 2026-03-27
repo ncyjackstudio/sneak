@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>Snake</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,67 +12,112 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100dvh;
       font-family: Consolas, monospace;
       color: #fff;
+      overflow: hidden;
+      touch-action: none;
     }
     h1 {
-      font-size: 2.5rem;
+      font-size: clamp(1.4rem, 6vw, 2.5rem);
       color: #32c832;
       letter-spacing: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
     #scoreboard {
-      font-size: 1rem;
-      margin-bottom: 12px;
+      font-size: clamp(0.8rem, 3vw, 1rem);
+      margin-bottom: 8px;
       color: #aaa;
     }
     #scoreboard span { color: #fff; font-weight: bold; }
+    #canvas-wrap {
+      position: relative;
+      width: min(100vw, 100dvh * 1.25);
+    }
     canvas {
       border: 2px solid #222;
       background: #0a0a0a;
       display: block;
+      width: 100%;
+      height: auto;
+      touch-action: none;
     }
     #overlay {
       position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 14px;
+      background: rgba(0,0,0,0.6);
     }
     #overlay.hidden { display: none; }
-    #overlay h2 { font-size: 2rem; color: #e03232; }
-    #overlay p  { color: #aaa; font-size: 0.95rem; }
+    #overlay h2 { font-size: clamp(1.4rem, 6vw, 2rem); color: #e03232; }
+    #overlay p  { color: #aaa; font-size: clamp(0.75rem, 3vw, 0.95rem); text-align: center; padding: 0 16px; }
     #overlay button {
       margin-top: 6px;
-      padding: 10px 36px;
+      padding: 12px 40px;
       background: #32c832;
       color: #000;
       border: none;
-      border-radius: 6px;
-      font-size: 1rem;
+      border-radius: 8px;
+      font-size: clamp(0.9rem, 4vw, 1rem);
       font-family: inherit;
       font-weight: bold;
       cursor: pointer;
       letter-spacing: 1px;
     }
-    #overlay button:hover { background: #28a828; }
-    #hint { margin-top: 8px; font-size: 0.8rem; color: #444; }
+    #overlay button:active { background: #28a828; }
+
+    /* D-pad */
+    #dpad {
+      display: grid;
+      grid-template-areas: ". up ." "left . right" ". down .";
+      grid-template-columns: repeat(3, 60px);
+      grid-template-rows: repeat(3, 60px);
+      gap: 6px;
+      margin-top: 14px;
+    }
+    #dpad button {
+      background: #1a1a1a;
+      border: 2px solid #333;
+      border-radius: 10px;
+      color: #32c832;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #dpad button:active { background: #2a2a2a; border-color: #32c832; }
+    #btn-up    { grid-area: up; }
+    #btn-left  { grid-area: left; }
+    #btn-right { grid-area: right; }
+    #btn-down  { grid-area: down; }
+    #hint { margin-top: 6px; font-size: 0.75rem; color: #333; }
   </style>
 </head>
 <body>
   <h1>SNAKE</h1>
   <div id="scoreboard">Score: <span id="score">0</span> &nbsp;|&nbsp; Best: <span id="best">0</span></div>
-  <div style="position:relative;">
+  <div id="canvas-wrap">
     <canvas id="c"></canvas>
     <div id="overlay">
       <h2 id="overlay-title">SNAKE</h2>
-      <p id="overlay-msg">Use arrow keys or WASD to move</p>
+      <p id="overlay-msg">Swipe or use D-pad to move</p>
       <button id="btn">PLAY</button>
     </div>
   </div>
-  <div id="hint">ESC — pause &nbsp;|&nbsp; Arrow keys / WASD — move</div>
+  <div id="dpad">
+    <button id="btn-up">▲</button>
+    <button id="btn-left">◀</button>
+    <button id="btn-right">▶</button>
+    <button id="btn-down">▼</button>
+  </div>
+  <div id="hint">Swipe on canvas &nbsp;|&nbsp; Arrow keys / WASD — move</div>
 
 <script>
 const TILE = 20, COLS = 30, ROWS = 24;
@@ -93,6 +138,10 @@ let snake, dir, nextDir, food, score, best = 0, loop, paused = false, alive = fa
 const UP = [0,-1], DOWN = [0,1], LEFT = [-1,0], RIGHT = [1,0];
 
 function opposite(a, b) { return a[0] === -b[0] && a[1] === -b[1]; }
+
+function setDir(d) {
+  if (!opposite(d, dir)) nextDir = d;
+}
 
 function randomFood() {
   const set = new Set(snake.map(([x,y]) => `${x},${y}`));
@@ -129,10 +178,8 @@ function endGame() {
 function tick() {
   dir = nextDir;
   const head = [snake[0][0] + dir[0], snake[0][1] + dir[1]];
-
   if (head[0] < 0 || head[0] >= COLS || head[1] < 0 || head[1] >= ROWS) return endGame();
   if (snake.some(([x,y]) => x === head[0] && y === head[1])) return endGame();
-
   snake.unshift(head);
   if (head[0] === food[0] && head[1] === food[1]) {
     score += 10;
@@ -147,13 +194,11 @@ function tick() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Grid
   ctx.strokeStyle = '#1a1a1a';
   ctx.lineWidth = 0.5;
   for (let x = 0; x <= COLS; x++) { ctx.beginPath(); ctx.moveTo(x*TILE,0); ctx.lineTo(x*TILE,canvas.height); ctx.stroke(); }
   for (let y = 0; y <= ROWS; y++) { ctx.beginPath(); ctx.moveTo(0,y*TILE); ctx.lineTo(canvas.width,y*TILE); ctx.stroke(); }
 
-  // Snake
   snake.forEach(([x,y], i) => {
     const isHead = i === 0;
     ctx.fillStyle = isHead ? '#1e8c1e' : '#32c832';
@@ -166,7 +211,6 @@ function draw() {
     }
   });
 
-  // Food
   const [fx, fy] = food;
   const cx = fx*TILE + TILE/2, cy = fy*TILE + TILE/2;
   ctx.fillStyle = '#dc3232';
@@ -185,6 +229,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+// Keyboard
 document.addEventListener('keydown', e => {
   const map = {
     ArrowUp: UP, w: UP, W: UP,
@@ -192,21 +237,40 @@ document.addEventListener('keydown', e => {
     ArrowLeft: LEFT, a: LEFT, A: LEFT,
     ArrowRight: RIGHT, d: RIGHT, D: RIGHT,
   };
-  if (map[e.key] && !opposite(map[e.key], dir)) {
-    nextDir = map[e.key];
-    e.preventDefault();
-  }
+  if (map[e.key]) { setDir(map[e.key]); e.preventDefault(); }
   if (e.key === 'Escape' && alive) {
     paused = !paused;
-    if (paused) { clearInterval(loop); }
-    else { loop = setInterval(tick, 100); }
+    paused ? clearInterval(loop) : (loop = setInterval(tick, 100));
   }
   if (e.key === ' ' && !alive) startGame();
 });
 
+// D-pad buttons
+document.getElementById('btn-up').addEventListener('pointerdown',    e => { e.preventDefault(); setDir(UP); });
+document.getElementById('btn-down').addEventListener('pointerdown',  e => { e.preventDefault(); setDir(DOWN); });
+document.getElementById('btn-left').addEventListener('pointerdown',  e => { e.preventDefault(); setDir(LEFT); });
+document.getElementById('btn-right').addEventListener('pointerdown', e => { e.preventDefault(); setDir(RIGHT); });
+
+// Swipe on canvas
+let touchX = null, touchY = null;
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  touchX = e.touches[0].clientX;
+  touchY = e.touches[0].clientY;
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  const dy = e.changedTouches[0].clientY - touchY;
+  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+  if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? RIGHT : LEFT);
+  else setDir(dy > 0 ? DOWN : UP);
+  touchX = touchY = null;
+}, { passive: false });
+
 btn.addEventListener('click', startGame);
 
-// Initial draw
 ctx.fillStyle = '#0a0a0a';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 </script>
